@@ -17,6 +17,8 @@
 
 .slot-remove svg{display:block;width:12px;height:12px;pointer-events:none}
 .dialog-header .icon-button svg{display:block;width:16px;height:16px;pointer-events:none}
+.brand-mark{flex-shrink:0;overflow:hidden}
+.brand-mark img{display:block;width:100%;height:100%;object-fit:contain}
 
 /* Keep roster and cycle settings together in the left column. */
 .roster-column{position:sticky;top:20px;min-width:0;display:flex;flex-direction:column;gap:14px;max-height:calc(100dvh - 155px)}
