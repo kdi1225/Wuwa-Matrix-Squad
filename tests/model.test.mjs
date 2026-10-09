@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import {CHARACTERS} from '../src/data.js';
 import {defaultState,placeCharacter,limitFor,normalizeState,validateParties,usageOf} from '../src/model.js';
 
-test('roster includes 61 entries, 7 supporters, and Lily placeholder',()=>{
+test('roster includes 61 entries, 7 supporters, and upcoming Lily',()=>{
   assert.equal(CHARACTERS.length,61);
   assert.equal(new Set(CHARACTERS.map(c=>c.id)).size,61);
   assert.equal(CHARACTERS.filter(c=>c.supporter).length,7);
-  assert.equal(CHARACTERS.find(c=>c.id==='릴리').image,null);
+  assert.equal(CHARACTERS.find(c=>c.id==='릴리').upcoming,true);
 });
 test('normal characters cannot be copied to a second party',()=>{
   let state=defaultState();
