@@ -17,6 +17,7 @@
       <span class="save-indicator" id="save-status" role="status"><span></span>이 브라우저에 자동 저장</span>
     </header>
     <main class="workspace">
+      <div class="roster-column">
       <section class="roster-panel panel" aria-labelledby="roster-title">
         <div class="panel-title"><div><span class="eyebrow">RESONATORS</span><h2 id="roster-title">공명자 도감 <span id="roster-count" class="count-label"></span></h2></div><span class="drag-hint">끌어서 편성 <span aria-hidden="true">↗</span></span></div>
         <nav class="element-filters" id="element-filters" aria-label="공명자 속성 필터"></nav>
@@ -24,9 +25,10 @@
         <div class="roster-grid" id="roster-grid" aria-label="캐릭터 목록"></div>
         <div class="roster-footer"><span><span class="legend-dot"></span>일반 1회 · 서포터 2회</span><span>표시: 사용 / 최대</span></div>
       </section>
+        <div class="cycle-bar"><div class="cycle-description"><span class="cycle-icon" aria-hidden="true">✦</span><div><strong>이번 주기 추가 편성</strong><span id="cycle-summary">지정한 공명자를 최대 2회 편성할 수 있어요.</span></div></div><button class="button button-quiet" id="cycle-button" type="button">대상 설정 <span aria-hidden="true">↗</span></button></div>
+      </div>
       <section class="squad-panel" aria-labelledby="squad-title">
         <div class="squad-heading"><div><span class="eyebrow">MY LINEUP</span><h2 id="squad-title">나의 파티 <span id="party-count" class="count-label"></span></h2></div><span id="assignment-count" class="assignment-count"></span></div>
-        <div class="cycle-bar"><div class="cycle-description"><span class="cycle-icon" aria-hidden="true">✦</span><div><strong>이번 주기 추가 편성</strong><span id="cycle-summary">지정한 공명자를 최대 2회 편성할 수 있어요.</span></div></div><button class="button button-quiet" id="cycle-button" type="button">대상 설정 <span aria-hidden="true">↗</span></button></div>
         <p class="selection-guide" id="selection-guide" aria-live="polite">캐릭터를 드래그하거나, 선택한 뒤 빈 슬롯을 눌러주세요.</p>
         <div class="party-list" id="party-list"></div>
         <button class="add-party" id="add-party" type="button"><span aria-hidden="true">＋</span> 새로운 파티 추가</button>
