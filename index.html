@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d0f14">
+  <meta name="description" content="명조 종말 매트릭스 파티 편성 도구. 보유 공명자를 선택하고, 드래그로 나만의 파티를 구성하세요.">
+  <title>종말 매트릭스 · 파티 편성</title>
+  <link rel="icon" href="./public/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./src/app.js"></script>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="종말 매트릭스 홈"><span class="brand-mark" aria-hidden="true">⌘</span><span><span class="eyebrow">WUTHERING WAVES / SQUAD PLANNER</span><h1>종말 매트릭스<span class="title-divider">/</span><span class="title-detail">파티 편성</span></h1></span></a>
+      <span class="save-indicator" id="save-status" role="status"><span></span>이 브라우저에 자동 저장</span>
+    </header>
+    <main class="workspace">
+      <section class="roster-panel panel" aria-labelledby="roster-title">
+        <div class="panel-title"><div><span class="eyebrow">RESONATORS</span><h2 id="roster-title">공명자 도감 <span id="roster-count" class="count-label"></span></h2></div><span class="drag-hint">끌어서 편성 <span aria-hidden="true">↗</span></span></div>
+        <nav class="element-filters" id="element-filters" aria-label="공명자 속성 필터"></nav>
+        <div class="roster-tools"><button class="button" id="owned-button" type="button"><span aria-hidden="true">⚙</span> 보유 공명자 설정 <span class="mini-count" id="owned-count">0</span></button><label class="toggle-label"><input type="checkbox" id="only-owned"><span class="toggle-track" aria-hidden="true"></span>보유만 보기</label></div>
+        <div class="roster-grid" id="roster-grid" aria-label="캐릭터 목록"></div>
+        <div class="roster-footer"><span><span class="legend-dot"></span>일반 1회 · 서포터 2회</span><span>표시: 사용 / 최대</span></div>
+      </section>
+      <section class="squad-panel" aria-labelledby="squad-title">
+        <div class="squad-heading"><div><span class="eyebrow">MY LINEUP</span><h2 id="squad-title">나의 파티 <span id="party-count" class="count-label"></span></h2></div><span id="assignment-count" class="assignment-count"></span></div>
+        <div class="cycle-bar"><div class="cycle-description"><span class="cycle-icon" aria-hidden="true">✦</span><div><strong>이번 주기 추가 편성</strong><span id="cycle-summary">지정한 공명자를 최대 2회 편성할 수 있어요.</span></div></div><button class="button button-quiet" id="cycle-button" type="button">대상 설정 <span aria-hidden="true">↗</span></button></div>
+        <p class="selection-guide" id="selection-guide" aria-live="polite">캐릭터를 드래그하거나, 선택한 뒤 빈 슬롯을 눌러주세요.</p>
+        <div class="party-list" id="party-list"></div>
+        <button class="add-party" id="add-party" type="button"><span aria-hidden="true">＋</span> 새로운 파티 추가</button>
+        <p class="squad-footnote">파티 안의 캐릭터를 끌어 순서를 바꾸거나 다른 파티로 이동할 수 있어요.</p>
+      </section>
+    </main>
+    <footer class="site-footer"><span>WUWA MATRIX SQUAD</span><span>비공식 팬 제작 편성 도구</span></footer>
+  </div>
+  <dialog id="settings-dialog" aria-labelledby="dialog-title" aria-describedby="dialog-description">
+    <form method="dialog" id="settings-form">
+      <div class="dialog-header"><div><span class="eyebrow" id="dialog-eyebrow">MY RESONATORS</span><h2 id="dialog-title">보유 공명자 설정</h2><p id="dialog-description"></p></div><button class="icon-button" type="button" id="dialog-close" aria-label="닫기">×</button></div>
+      <div class="dialog-toolbar"><span id="dialog-count"></span><div><button type="button" class="button" id="select-all">전체 선택</button><button type="button" class="button" id="deselect-all">전체 해제</button></div></div>
+      <div class="settings-grid" id="settings-grid"></div>
+      <p id="dialog-error" class="dialog-error" role="alert" hidden></p>
+      <div class="dialog-footer"><label id="dialog-filter-label" class="checkbox-label"><input type="checkbox" id="dialog-only-owned">보유한 공명자만 보기</label><span id="cycle-note" class="muted" hidden>서포터는 항상 최대 2회예요.</span><div><button type="button" class="button" id="dialog-cancel">취소</button><button type="submit" class="button button-primary" id="dialog-save">보유 현황 저장</button></div></div>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <noscript>이 편성 도구를 사용하려면 브라우저의 JavaScript를 활성화해주세요.</noscript>
+</body>
+</html>
