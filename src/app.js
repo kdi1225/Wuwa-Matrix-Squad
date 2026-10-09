@@ -3,6 +3,7 @@ import {STORAGE_KEY,defaultState,newParty,limitFor,usageOf,validateParties,place
 const $=id=>document.getElementById(id);
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const paths={
+  close:'<path d="m6 6 12 12M6 18 18 6"/>',
   person:'<circle cx="12" cy="8" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/>',
   up:'<path d="m6 14 6-6 6 6"/>',down:'<path d="m6 10 6 6 6-6"/>',grip:'<path d="M8 5h0m8 0h0M8 12h0m8 0h0M8 19h0m8 0h0" stroke-width="3"/>'
 };
@@ -35,7 +36,7 @@ function renderParties(){
   $('assignment-count').textContent=`${assigned}명 편성`;
   $('party-list').innerHTML=state.parties.map((p,i)=>`<article class="party" data-party="${p.id}" aria-label="파티 ${i+1}"><div class="party-header"><div class="party-label"><button class="party-grip" type="button" draggable="true" data-party-drag="${p.id}" aria-label="파티 ${i+1} 순서 드래그">${icon('grip')}</button><span class="party-number">${String(i+1).padStart(2,'0')}</span><h3 class="party-name">파티 ${i+1}</h3></div><div class="party-controls"><button class="icon-button" type="button" data-reorder="${p.id}" data-direction="-1" aria-label="파티 ${i+1} 위로" ${i===0?'disabled':''}>${icon('up')}</button><button class="icon-button" type="button" data-reorder="${p.id}" data-direction="1" aria-label="파티 ${i+1} 아래로" ${i===state.parties.length-1?'disabled':''}>${icon('down')}</button><button class="party-delete" type="button" data-delete-party="${p.id}" aria-label="파티 ${i+1} 삭제">삭제</button></div></div><div class="slots">${p.slots.map((id,index)=>{
     const c=CHARACTER_MAP.get(id),selected=selection?.source?.partyId===p.id&&selection.source.index===index;
-    return `<div class="slot"><button type="button" class="slot-target ${c?'filled':'empty'} ${selected?'selected':''}" data-slot-party="${p.id}" data-slot-index="${index}" ${c?`data-element="${c.element}" draggable="true"`:''} aria-label="파티 ${i+1} 슬롯 ${index+1}${c?' '+escape(c.name):' 비어 있음'}">${c?`${portrait(c,false)}<span class="slot-label">${elementIcon(c.element)}${escape(c.name)}</span>`:'<span class="slot-symbol">＋</span><span class="slot-caption">공명자 추가</span>'}</button>${c?`<button type="button" class="slot-remove" data-remove-party="${p.id}" data-remove-index="${index}" aria-label="파티 ${i+1} ${escape(c.name)} 편성 해제">×</button>`:''}</div>`;
+    return `<div class="slot"><button type="button" class="slot-target ${c?'filled':'empty'} ${selected?'selected':''}" data-slot-party="${p.id}" data-slot-index="${index}" ${c?`data-element="${c.element}" draggable="true"`:''} aria-label="파티 ${i+1} 슬롯 ${index+1}${c?' '+escape(c.name):' 비어 있음'}">${c?`${portrait(c,false)}<span class="slot-label">${elementIcon(c.element)}${escape(c.name)}</span>`:'<span class="slot-symbol">＋</span><span class="slot-caption">공명자 추가</span>'}</button>${c?`<button type="button" class="slot-remove" data-remove-party="${p.id}" data-remove-index="${index}" aria-label="파티 ${i+1} ${escape(c.name)} 편성 해제">${icon('close')}</button>`:''}</div>`;
   }).join('')}</div></article>`).join('');
 }
 function renderGuide(){$('selection-guide').classList.toggle('active',!!selection);$('selection-guide').textContent=selection?`${CHARACTER_MAP.get(selection.id).name} 선택됨 · 배치할 슬롯을 눌러주세요. (Esc로 해제)`:'캐릭터를 드래그하거나, 선택한 뒤 빈 슬롯을 눌러주세요.';}

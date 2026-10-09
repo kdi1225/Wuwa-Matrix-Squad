@@ -14,3 +14,5 @@
 .element-icon{display:block;width:18px;height:18px;object-fit:contain;flex-shrink:0;clip-path:circle(45% at 50% 50%);pointer-events:none;user-select:none}
 .element-badge .element-icon{width:100%;height:100%;max-width:none;transform:scale(1.111111);transform-origin:center}
 .slot-label .element-icon{width:16px;height:16px}
+
+.slot-remove svg{display:block;width:12px;height:12px;pointer-events:none}
