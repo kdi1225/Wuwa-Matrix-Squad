@@ -1,5 +1,5 @@
 import {CHARACTERS,CHARACTER_MAP,ELEMENTS} from './data.js';
-import {STORAGE_KEY,defaultState,newParty,limitFor,usageOf,validateParties,placeCharacter,normalizeState} from './model.js';
+import {STORAGE_KEY,defaultState,newParty,limitFor,usageOf,validateParties,placeCharacter,normalizeState,groupFor} from './model.js';
 const $=id=>document.getElementById(id);
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const paths={
@@ -10,8 +10,8 @@ const paths={
 const icon=key=>`<svg viewBox="0 0 24 24" aria-hidden="true">${paths[key]||paths.person}</svg>`;
 const elementIcon=element=>`<img class="element-icon" src="./public/images/elements/${encodeURIComponent(element)}.png" alt="${escape(element)}" draggable="false">`;
 let state=defaultState(),selection=null,dragSelection=null,dragParty=null,toastTimer,dialogMode=null,draft=new Set();
-let storageError=false;
-try{const saved=localStorage.getItem(STORAGE_KEY);if(saved)state=normalizeState(JSON.parse(saved));}catch{storageError=true;}
+let storageError=false,roverSaveAdjusted=false;
+try{const saved=localStorage.getItem(STORAGE_KEY);if(saved){const raw=JSON.parse(saved);state=normalizeState(raw);const oldRoverUses=raw.parties.reduce((n,p)=>n+p.slots.filter(id=>groupFor(id)==='방랑자').length,0);roverSaveAdjusted=oldRoverUses>usageOf(state,'방랑자·회절');}}catch{storageError=true;}
 const dialog=$('settings-dialog');
 function notify(message){$('toast').textContent=message;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),3500);}
 function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));storageError=false;}catch{storageError=true;notify('브라우저에 저장할 수 없어요. 사이트 저장 공간 설정을 확인해주세요.');}renderSaveStatus();}
@@ -53,7 +53,7 @@ function openSettings(mode){
   dialogMode=mode;draft=new Set(mode==='owned'?state.owned:state.cycle);
   $('dialog-eyebrow').textContent=mode==='owned'?'MY RESONATORS':'CYCLE BONUS';
   $('dialog-title').textContent=mode==='owned'?'보유 공명자 설정':'주기별 추가 편성 대상';
-  $('dialog-description').textContent=mode==='owned'?'보유 중인 공명자를 선택하세요. 저장한 목록을 도감 필터에 적용할 수 있어요.':'이번 주기에 2회 편성이 허용되는 공명자를 선택하세요.';
+  $('dialog-description').textContent=mode==='owned'?'보유 중인 공명자를 선택하세요. 저장한 목록을 도감 필터에 적용할 수 있어요.':'이번 주기에 2회 편성이 허용되는 공명자를 선택하세요. 방랑자는 어느 속성을 선택해도 모든 속성을 합쳐 최대 2회예요.';
   $('dialog-save').textContent=mode==='owned'?'보유 현황 저장':'주기 설정 저장';
   $('dialog-filter-label').hidden=mode!=='owned';$('cycle-note').hidden=mode==='owned';$('dialog-only-owned').checked=state.onlyOwned;$('dialog-error').hidden=true;
   renderDialog();dialog.showModal();$('settings-grid').scrollTop=0;
@@ -104,4 +104,5 @@ $('settings-form').addEventListener('submit',event=>{
   const error=validateParties(next);if(error){$('dialog-error').textContent=error+' 해당 공명자를 파티에서 해제한 후 설정을 변경해주세요.';$('dialog-error').hidden=false;return;}
   commit(next);dialog.close();if(!storageError)notify(dialogMode==='owned'?'보유 현황을 저장했어요.':'주기별 편성 대상을 저장했어요.');
 });
-render();if(storageError)notify('저장된 정보를 읽지 못했어요. 브라우저 저장 설정을 확인해주세요.');
+if(roverSaveAdjusted)persist();
+render();if(storageError)notify('저장된 정보를 읽지 못했어요. 브라우저 저장 설정을 확인해주세요.');else if(roverSaveAdjusted)notify('방랑자 편성 횟수를 속성별로 합산해, 저장된 초과 편성을 해제했어요.');

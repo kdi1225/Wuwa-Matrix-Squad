@@ -13,7 +13,7 @@ const entries = [
 ];
 // Stable IDs deliberately do not depend on display order. One shared portrait serves the four Rover forms.
 export const CHARACTERS = entries.map(([name,element,imageName])=>({
-  id:name, name, element, supporter:SUPPORTERS.includes(name), upcoming:name==='릴리',
+  id:name, name, element, usageGroup:name.startsWith('방랑자·')?'방랑자':name, supporter:SUPPORTERS.includes(name), upcoming:name==='릴리',
   image:imageName===null?null:`./public/images/characters/${encodeURIComponent(imageName??name)}.webp`
 })).reverse();
 export const CHARACTER_MAP = new Map(CHARACTERS.map(c=>[c.id,c]));

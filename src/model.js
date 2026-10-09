@@ -2,14 +2,15 @@ import { CHARACTERS, CHARACTER_MAP, ELEMENTS } from './data.js';
 export const STORAGE_KEY = 'wuwa-matrix-squad:v1';
 export const newParty = () => ({id:crypto.randomUUID(),slots:[null,null,null]});
 export const defaultState = () => ({version:1,parties:[newParty(),newParty(),newParty()],owned:[],onlyOwned:false,element:'전체',cycle:[]});
-export const limitFor = (state,id) => CHARACTER_MAP.get(id)?.supporter || state.cycle.includes(id) ? 2 : 1;
-export const usageOf = (state,id) => state.parties.reduce((n,p)=>n+p.slots.filter(value=>value===id).length,0);
+export const groupFor = id => CHARACTER_MAP.get(id)?.usageGroup ?? id;
+export const limitFor = (state,id) => CHARACTER_MAP.get(id)?.supporter || state.cycle.some(value=>groupFor(value)===groupFor(id)) ? 2 : 1;
+export const usageOf = (state,id) => state.parties.reduce((n,p)=>n+p.slots.filter(value=>value&&groupFor(value)===groupFor(id)).length,0);
 export function validateParties(state) {
   for (const party of state.parties) {
-    const filled=party.slots.filter(Boolean);
+    const filled=party.slots.filter(Boolean).map(groupFor);
     if (new Set(filled).size!==filled.length) return '같은 파티에 동일한 공명자를 두 번 편성할 수 없어요.';
   }
-  for (const c of CHARACTERS) if(usageOf(state,c.id)>limitFor(state,c.id)) return `${c.name}의 편성 가능 횟수(${limitFor(state,c.id)}회)를 초과했어요.`;
+  for (const c of CHARACTERS) if(usageOf(state,c.id)>limitFor(state,c.id)) return `${groupFor(c.id)}의 편성 가능 횟수(${limitFor(state,c.id)}회)를 초과했어요.`;
   return null;
 }
 export function placeCharacter(state,selection,partyId,index) {
@@ -39,6 +40,16 @@ export function normalizeState(raw) {
     state.parties.push({id,slots:party.slots.map(value=>CHARACTER_MAP.has(value)?value:null)});
   }
   if(!state.parties.length)state.parties.push(newParty());
+  // Older saves counted Rover elements separately. Keep the earliest legal placements.
+  let roverUses=0;
+  for(const party of state.parties){
+    let hasRover=false;
+    party.slots=party.slots.map(id=>{
+      if(groupFor(id)!=='방랑자')return id;
+      if(hasRover||roverUses>=limitFor(state,id))return null;
+      hasRover=true;roverUses++;return id;
+    });
+  }
   if(validateParties(state))throw new Error('Invalid saved lineup');
   return state;
 }
