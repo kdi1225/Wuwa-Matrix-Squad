@@ -1,5 +1,7 @@
 import {CHARACTERS,CHARACTER_MAP,ELEMENTS} from './data.js';
 import {STORAGE_KEY,defaultState,newParty,limitFor,usageOf,validateParties,placeCharacter,normalizeState,groupFor} from './model.js';
+const nameCollator = new Intl.Collator('ko');
+const charactersByName = [...CHARACTERS].sort((a, b) => nameCollator.compare(a.name, b.name));
 const $=id=>document.getElementById(id);
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const paths={
@@ -19,7 +21,7 @@ function renderSaveStatus(){$('save-status').classList.toggle('error',storageErr
 function portrait(c,lazy=true){return c.image?`<img src="${escape(c.image)}" alt="" ${lazy?'loading="lazy"':''} draggable="false">`:`<div class="silhouette">${icon('person')}</div><span class="upcoming-tag">출시 예정</span>`;}
 function renderRoster(){
   const grid=$('roster-grid'),top=grid.scrollTop;
-  const list=CHARACTERS
+  const list=charactersByName
     .filter(c=>(state.element==='전체'||state.element===c.element)&&(!state.onlyOwned||state.owned.includes(c.id)))
     .map(character=>{
       const count=usageOf(state,character.id);
@@ -50,7 +52,7 @@ function render(){renderRoster();renderParties();renderGuide();renderSaveStatus(
 function commit(next){state=next;selection=null;persist();render();}
 function place(partyId,index,pick=selection){const result=placeCharacter(state,pick,partyId,index);if(result.error){notify(result.error);return;}const name=CHARACTER_MAP.get(pick.id).name;commit(result.state);notify(`${name} 편성 완료`);}
 function reorder(id,targetIndex){const from=state.parties.findIndex(p=>p.id===id);if(from<0||targetIndex<0||targetIndex>=state.parties.length)return;const parties=[...state.parties];const [party]=parties.splice(from,1);parties.splice(targetIndex,0,party);commit({...state,parties});}
-function dialogCharacters(){return dialogMode==='owned'?CHARACTERS:CHARACTERS.filter(c=>!c.supporter);}
+function dialogCharacters(){return dialogMode==='owned'?charactersByName:charactersByName.filter(c=>!c.supporter);}
 function updateDialogCount(){$('dialog-count').textContent=`${draft.size}명 선택 / ${dialogCharacters().length}명`;}
 function renderDialog(){
   $('settings-grid').innerHTML=dialogCharacters().map(c=>`<button type="button" class="owned-card" data-draft="${escape(c.id)}" data-element="${c.element}" aria-pressed="${draft.has(c.id)}" aria-label="${escape(c.name)} ${draft.has(c.id)?'선택됨':'선택 안 됨'}" title="${escape(c.name)}"><div class="portrait">${portrait(c)}<span class="element-badge">${elementIcon(c.element)}</span></div><span class="owned-name">${escape(c.name)}</span><span class="check-mark" aria-hidden="true">✓</span></button>`).join('');updateDialogCount();
