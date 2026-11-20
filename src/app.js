@@ -19,13 +19,19 @@ function renderSaveStatus(){$('save-status').classList.toggle('error',storageErr
 function portrait(c,lazy=true){return c.image?`<img src="${escape(c.image)}" alt="" ${lazy?'loading="lazy"':''} draggable="false">`:`<div class="silhouette">${icon('person')}</div><span class="upcoming-tag">출시 예정</span>`;}
 function renderRoster(){
   const grid=$('roster-grid'),top=grid.scrollTop;
-  const list=CHARACTERS.filter(c=>(state.element==='전체'||state.element===c.element)&&(!state.onlyOwned||state.owned.includes(c.id)));
+  const list=CHARACTERS
+    .filter(c=>(state.element==='전체'||state.element===c.element)&&(!state.onlyOwned||state.owned.includes(c.id)))
+    .map(character=>{
+      const count=usageOf(state,character.id);
+      const limit=limitFor(state,character.id);
+      return {character,count,limit,full:count>=limit};
+    })
+    .sort((a,b)=>Number(a.full)-Number(b.full));
   $('roster-count').textContent=`${list.length} / ${CHARACTERS.length}`;
   $('element-filters').innerHTML=ELEMENTS.map(e=>`<button type="button" class="filter" data-filter="${e}" aria-pressed="${state.element===e}">${e}</button>`).join('');
   $('owned-count').textContent=state.owned.length;
   $('only-owned').checked=state.onlyOwned;
-  grid.innerHTML=list.length?list.map(c=>{
-    const count=usageOf(state,c.id),limit=limitFor(state,c.id),full=count>=limit;
+  grid.innerHTML=list.length?list.map(({character:c,count,limit,full})=>{
     return `<button type="button" class="character-card ${selection?.id===c.id&&!selection.source?'selected':''}" data-character="${escape(c.id)}" data-element="${c.element}" draggable="${!full}" aria-disabled="${full}" aria-pressed="${selection?.id===c.id&&!selection.source}" aria-label="${escape(c.name)}, ${c.element}, ${count}/${limit}회 편성" title="${escape(c.name)} · ${c.element}${c.supporter?' · 서포터':''}"><div class="portrait">${portrait(c)}<span class="element-badge">${elementIcon(c.element)}</span>${limit===2?`<span class="limit-badge ${c.supporter?'':'cycle'}">${c.supporter?'2회':'주기 2회'}</span>`:''}</div><div class="card-info"><span class="card-name">${escape(c.name)}</span><span class="card-bottom"><span>${c.element}</span><span class="usage ${count?'used':''}"><b>${count}</b> / ${limit}</span></span></div>${full?'<span class="completed-label">편성 완료</span>':''}</button>`;
   }).join(''):`<div class="empty-roster"><span class="empty-icon">◇</span>${state.onlyOwned?'조건에 맞는 보유 공명자가 없어요.':'해당 속성의 공명자가 없어요.'}${state.onlyOwned?'<br><button class="button" type="button" data-open-owned>보유 공명자 선택</button>':''}</div>`;
   grid.scrollTop=top;
